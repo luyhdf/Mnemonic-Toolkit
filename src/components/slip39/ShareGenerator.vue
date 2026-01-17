@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import Slip39 from 'slip39'
-import * as bip39 from 'bip39'
+import { useSlip39 } from '../../composables/useSlip39'
 import GroupConfig from './GroupConfig.vue'
 
 const props = defineProps({
@@ -12,6 +11,12 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['shares-generated', 'jump-to-recover'])
+
+// 使用 useSlip39 composable
+const { 
+  generateShares: generateSharesComposable, 
+  selectMinimalShares 
+} = useSlip39()
 
 const groupThreshold = ref(2)
 const groups = ref([
@@ -30,48 +35,14 @@ const generateShares = () => {
     console.log('=== 开始生成分片 ===')
     console.log('输入的BIP39助记词:', mnemonic.value)
     
-    // 检查助记词是否为空
-    if (!mnemonic.value || mnemonic.value.trim() === '') {
-      throw new Error('助记词不能为空')
-    }
-    
-    // 1. 将BIP39助记词转换为熵字节数组
-    let entropy
-    try {
-      entropy = bip39.mnemonicToEntropy(mnemonic.value)
-      console.log('转换后的熵 (hex):', entropy)
-    } catch (entropyError) {
-      throw new Error(`BIP39助记词无效: ${entropyError.message}`)
-    }
-    
-    // 检查entropy是否有效
-    if (!entropy) {
-      throw new Error('无法将助记词转换为熵')
-    }
-    
-    // 2. 转换为普通数组（不是Uint8Array！）
-    const entropyBytes = entropy.match(/.{1,2}/g).map(byte => parseInt(byte, 16))
-    console.log('转换后的熵 (Array):', entropyBytes)
-    console.log('熵字节长度:', entropyBytes.length)
-    
-    // 3. 确保groups是一个数组
-    const groupConfigs = (groups.value || []).map(g => [g.threshold, g.shares])
-    console.log('组配置:', groupConfigs)
-    
-    // 4. 使用Slip39.fromArray方法生成分片
-    const slip39node = Slip39.fromArray(entropyBytes, {
-      passphrase: password.value,
-      threshold: groupThreshold.value,
-      groups: groupConfigs
+    // 使用 composable 生成分片
+    const result = generateSharesComposable(mnemonic.value, {
+      groupThreshold: groupThreshold.value,
+      groups: groups.value,
+      password: password.value
     })
     
-    // 5. 检查slip39node.root是否存在
-    if (!slip39node || !slip39node.root) {
-      throw new Error('生成分片失败: 无法获取root节点')
-    }
-    
-    // 6. 获取所有分片
-    generatedShares.value = slip39node.root.mnemonics || []
+    generatedShares.value = result.shares
     console.log('生成的SLIP39分片:', generatedShares.value)
     status.value = '生成成功！'
     
@@ -94,31 +65,15 @@ const jumpToRecoverTest = () => {
   try {
     console.log('jumpToRecoverTest called')
     
-    // 选择足够数量的分片用于测试
-    const shares = generatedShares.value || []
-    const selectedShares = []
-    const groupSet = new Set()
+    // 计算需要的成员阈值（取第一个组的阈值作为参考）
+    const memberThreshold = groups.value.length > 0 ? groups.value[0].threshold : 1
     
-    // 遍历所有分片，每个组只取一个分片
-    shares.forEach(share => {
-      const groupIdMatch = share.match(/group-id=(\d+)/)
-      if (groupIdMatch && groupIdMatch[1]) {
-        const groupId = groupIdMatch[1]
-        if (!groupSet.has(groupId)) {
-          selectedShares.push(share)
-          groupSet.add(groupId)
-          // 如果已经收集了足够数量的组，就停止
-          if (selectedShares.length >= groupThreshold.value) {
-            return false
-          }
-        }
-      } else {
-        // 如果无法解析group-id，就只取前groupThreshold个分片
-        if (selectedShares.length < groupThreshold.value) {
-          selectedShares.push(share)
-        }
-      }
-    })
+    // 使用 composable 选择足够数量的分片用于测试
+    const selectedShares = selectMinimalShares(
+      generatedShares.value,
+      groupThreshold.value,
+      memberThreshold
+    )
     
     console.log('Selected shares:', selectedShares)
     

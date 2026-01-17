@@ -105,7 +105,7 @@
     - 在组件中使用composable
     - _需求: 1.1, 1.2, 1.3, 1.4, 1.5, 2.8_
   
-  - [ ] 7.2 创建useSlip39 composable
+  - [x] 7.2 创建useSlip39 composable
     - 提取SLIP39相关逻辑（生成分片、恢复）
     - 实现分片验证和解析函数
     - 在组件中使用composable

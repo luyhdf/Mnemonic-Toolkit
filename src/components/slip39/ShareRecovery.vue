@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import Slip39 from 'slip39'
-import * as bip39 from 'bip39'
+import { useSlip39 } from '../../composables/useSlip39'
 
 const props = defineProps({
   initialShares: {
@@ -15,6 +14,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['recovery-success', 'recovery-error'])
+
+// 使用 useSlip39 composable
+const { recoverSecret: recoverSecretComposable } = useSlip39()
 
 const password = ref('')
 const recoveredMnemonic = ref('')
@@ -79,41 +81,23 @@ const recoverMnemonic = () => {
   try {
     console.log('=== 开始恢复助记词 ===')
     
-    // 过滤有效分片
-    const validShares = inputShares.value.filter(share => share && share.trim())
-    console.log('输入的SLIP39分片:', validShares)
+    // 使用 composable 恢复助记词
+    const result = recoverSecretComposable(inputShares.value, password.value)
     
-    // 检查是否有有效分片
-    if (validShares.length === 0) {
-      throw new Error('请输入有效的SLIP39分片')
+    if (result.success) {
+      recoveredMnemonic.value = result.mnemonic
+      console.log('恢复的BIP39助记词:', recoveredMnemonic.value)
+      status.value = '恢复成功！'
+      
+      // 触发成功事件
+      emit('recovery-success', recoveredMnemonic.value)
+    } else {
+      status.value = result.error || '恢复失败'
+      console.error('恢复失败:', result.error)
+      
+      // 触发失败事件
+      emit('recovery-error', new Error(result.error))
     }
-    
-    // 1. 使用Slip39.recoverSecret方法恢复熵
-    const recoveredSecret = Slip39.recoverSecret(validShares, password.value)
-    console.log('恢复的原始数据 (Uint8Array):', recoveredSecret)
-    
-    // 检查恢复的数据是否有效
-    if (!recoveredSecret || recoveredSecret.length === 0) {
-      throw new Error('恢复失败: 无法从分片恢复数据')
-    }
-    
-    // 2. 转换为十六进制字符串
-    const secretHex = Array.from(recoveredSecret)
-      .map(byte => byte.toString(16).padStart(2, '0'))
-      .join('')
-    console.log('恢复的数据 (hex):', secretHex)
-    
-    // 3. 验证熵的长度是否符合BIP39要求
-    const entropyLength = recoveredSecret.length
-    console.log('恢复的数据长度:', entropyLength, '字节')
-    
-    // 4. 将熵转换为BIP39助记词
-    recoveredMnemonic.value = bip39.entropyToMnemonic(secretHex)
-    console.log('恢复的BIP39助记词:', recoveredMnemonic.value)
-    status.value = '恢复成功！'
-    
-    // 触发成功事件
-    emit('recovery-success', recoveredMnemonic.value)
     
     console.log('=== 恢复助记词完成 ===')
   } catch (error) {
