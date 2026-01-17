@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>协议检测测试</title>
+</head>
+<body>
+    <h1>环境检测测试</h1>
+    <div id="info"></div>
+    
+    <script>
+        const info = document.getElementById('info');
+        const protocol = window.location.protocol;
+        const isOffline = protocol === 'file:';
+        
+        info.innerHTML = `
+            <p><strong>当前协议:</strong> ${protocol}</p>
+            <p><strong>是否离线:</strong> ${isOffline ? '是' : '否'}</p>
+            <p><strong>完整URL:</strong> ${window.location.href}</p>
+        `;
+        
+        console.log('Protocol:', protocol);
+        console.log('Is Offline:', isOffline);
+    </script>
+</body>
+</html>

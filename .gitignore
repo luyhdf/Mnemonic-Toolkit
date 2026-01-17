@@ -11,3 +11,6 @@ yarn.lock
 package-lock.json
 
 *.log
+
+# 保留 docs 文件夹用于 GitHub Pages
+# !docs/

@@ -9,8 +9,13 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 
 import { defineConfig } from 'vite'
 
+// 判断是否为单文件构建模式
+const isSingleFile = process.env.BUILD_MODE === 'single'
+
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './', // 使用相对路径，适配GitHub Pages
+  
   resolve: {
     alias: {
       '~/': `${path.resolve(__dirname, 'src')}/`,
@@ -56,18 +61,19 @@ export default defineConfig({
       },
     }),
 
-    // Single file build plugin
-    viteSingleFile(),
+    // 仅在单文件模式下启用 viteSingleFile 插件
+    ...(isSingleFile ? [viteSingleFile()] : []),
   ],
 
   build: {
     target: 'esnext',
-    assetsInlineLimit: 100000000, // 100MB - inline all assets
+    outDir: isSingleFile ? 'docs/offline' : 'docs',
+    assetsInlineLimit: isSingleFile ? 100000000 : 4096, // 单文件模式内联所有资源
     chunkSizeWarningLimit: 100000000,
-    cssCodeSplit: false,
+    cssCodeSplit: !isSingleFile,
     rollupOptions: {
       output: {
-        inlineDynamicImports: true,
+        inlineDynamicImports: isSingleFile,
       },
     },
   },

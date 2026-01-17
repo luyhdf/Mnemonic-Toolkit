@@ -8,8 +8,9 @@
   "description": "比特币助记词生成、备份、还原工具 - 支持BIP39和SLIP39",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "build:single": "vite build",
+    "build": "pnpm run build:online && pnpm run build:offline",
+    "build:online": "vite build",
+    "build:offline": "BUILD_MODE=single vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit"

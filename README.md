@@ -2,6 +2,11 @@
 
 这是一个比特币助记词生成、备份、还原的单页面工具。
 
+## 🌐 在线使用
+
+- **在线版本**: [https://your-username.github.io/your-repo-name/](https://your-username.github.io/your-repo-name/)
+- **离线版本**: 访问在线版本后点击"下载离线版本"按钮
+
 ## 功能特性
 
 - ✅ **BIP39 助记词工具**
@@ -17,7 +22,9 @@
   - 分片复制和粘贴
 
 - ✅ **BIP39 和 SLIP39 互相转换**
-- ✅ **支持离线使用**（构建后可作为单 HTML 文件使用）
+- ✅ **支持在线和离线两种模式**
+  - 在线版本：多文件加载，适合快速访问
+  - 离线版本：单 HTML 文件，可在无网络环境下使用
 
 ## 技术栈
 
@@ -44,14 +51,45 @@ pnpm dev
 ### 构建生产版本
 
 ```bash
+# 构建在线版和离线版（推荐）
 pnpm build
+
+# 仅构建在线版
+pnpm run build:online
+
+# 仅构建离线版
+pnpm run build:offline
 ```
+
+构建后的文件：
+- `docs/` - 在线版本（用于 GitHub Pages）
+- `docs/offline/index.html` - 离线版本（单 HTML 文件）
 
 ### 预览生产构建
 
 ```bash
 pnpm preview
 ```
+
+## 部署到 GitHub Pages
+
+### 方法一：自动部署（推荐）
+
+1. 将代码推送到 GitHub 仓库
+2. 在仓库设置中启用 GitHub Pages
+   - Settings → Pages
+   - Source: GitHub Actions
+3. 推送代码后会自动触发部署
+
+### 方法二：手动部署
+
+1. 构建项目：`pnpm build`
+2. 提交 `docs` 文件夹到 Git
+3. 在 GitHub 仓库设置中启用 GitHub Pages
+   - Settings → Pages
+   - Source: Deploy from a branch
+   - Branch: main
+   - Folder: /docs
 
 ## 项目结构
 
@@ -76,15 +114,21 @@ src/
 ├── App.vue              # 应用主组件
 └── main.ts              # 应用入口
 
+docs/                    # GitHub Pages 部署目录
+├── index.html           # 在线版本入口
+├── assets/              # 在线版本资源文件
+└── offline/
+    └── index.html       # 离线版本（单文件）
 ```
 
 ## 安全提示
 
 ⚠️ **重要安全提示**：
-- 请在离线环境下使用此工具生成和管理助记词
+- **强烈建议使用离线版本**：下载离线版本后，在完全断网的环境中使用
 - 永远不要在不安全的网络环境下输入或显示助记词
 - 妥善保管你的助记词和分片
-- 建议使用构建后的单 HTML 文件版本，在完全离线的环境中使用
+- 不要截图或拍照保存助记词
+- 建议使用纸笔抄写并保存在安全的地方
 
 ## License
 
