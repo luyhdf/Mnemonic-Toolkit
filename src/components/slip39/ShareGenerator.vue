@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useSlip39 } from '../../composables/useSlip39'
+import { useClipboard } from '../../composables/useClipboard'
 import GroupConfig from './GroupConfig.vue'
 
 const props = defineProps({
@@ -17,6 +18,9 @@ const {
   generateShares: generateSharesComposable, 
   selectMinimalShares 
 } = useSlip39()
+
+// 使用 useClipboard composable
+const { writeToClipboardSafe } = useClipboard()
 
 const groupThreshold = ref(2)
 const groups = ref([
@@ -91,16 +95,17 @@ const jumpToRecoverTest = () => {
 }
 
 const copyShare = async (share) => {
-  try {
-    await navigator.clipboard.writeText(share)
+  const result = await writeToClipboardSafe(share)
+  
+  if (result.success) {
     status.value = '分片已复制到剪贴板'
     setTimeout(() => {
       if (status.value === '分片已复制到剪贴板') {
         status.value = ''
       }
     }, 2000)
-  } catch (error) {
-    console.error('复制失败:', error)
+  } else {
+    console.error('复制失败:', result.error)
     status.value = '复制失败，请手动复制'
   }
 }

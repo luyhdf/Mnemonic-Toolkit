@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useBip39 } from '../../composables/useBip39'
+import { useClipboard } from '../../composables/useClipboard'
 import { RefreshRight, DocumentCopy, Delete, Share } from '@element-plus/icons-vue'
 
 const props = defineProps({
@@ -19,6 +20,9 @@ const {
   parseMnemonicFromText,
   validateMnemonicArray
 } = useBip39()
+
+// 使用 useClipboard composable
+const { readFromClipboardSafe } = useClipboard()
 
 const words = ref([])
 const isValid = ref(false)
@@ -60,24 +64,26 @@ const convertToSLIP39 = () => {
 }
 
 const pasteFromClipboard = async () => {
-  try {
-    const text = await navigator.clipboard.readText()
-    const newWords = parseMnemonicFromText(text)
-
-    // 使用 validateMnemonicArray 验证助记词
-    const validation = validateMnemonicArray(newWords, props.wordCount)
-    
-    if (!validation.isValid) {
-      console.error('粘贴验证失败:', validation.errors)
-      return
-    }
-
-    // 更新助记词
-    words.value = newWords
-    checkMnemonicValidity()
-  } catch (err) {
-    console.error('粘贴失败:', err)
+  const result = await readFromClipboardSafe()
+  
+  if (!result.success) {
+    console.error('粘贴失败:', result.error)
+    return
   }
+
+  const newWords = parseMnemonicFromText(result.text)
+
+  // 使用 validateMnemonicArray 验证助记词
+  const validation = validateMnemonicArray(newWords, props.wordCount)
+  
+  if (!validation.isValid) {
+    console.error('粘贴验证失败:', validation.errors)
+    return
+  }
+
+  // 更新助记词
+  words.value = newWords
+  checkMnemonicValidity()
 }
 
 // 监听 words 变化

@@ -111,7 +111,7 @@
     - 在组件中使用composable
     - _需求: 6.1-6.9, 7.1-7.7_
   
-  - [ ] 7.3 创建useClipboard composable
+  - [x] 7.3 创建useClipboard composable
     - 实现剪贴板读写功能
     - 添加浏览器兼容性检测
     - 在组件中使用composable

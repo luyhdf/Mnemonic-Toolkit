@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useSlip39 } from '../../composables/useSlip39'
+import { useClipboard } from '../../composables/useClipboard'
 
 const props = defineProps({
   initialShares: {
@@ -17,6 +18,9 @@ const emit = defineEmits(['recovery-success', 'recovery-error'])
 
 // 使用 useSlip39 composable
 const { recoverSecret: recoverSecretComposable } = useSlip39()
+
+// 使用 useClipboard composable
+const { readFromClipboardSafe, writeToClipboardSafe } = useClipboard()
 
 const password = ref('')
 const recoveredMnemonic = ref('')
@@ -56,24 +60,27 @@ const clearShares = () => {
 }
 
 const pasteFromClipboard = async () => {
-  try {
-    const text = await navigator.clipboard.readText()
-    if (text && text.trim()) {
-      // 尝试解析多行分片
-      const lines = text.split('\n').filter(line => line.trim())
-      if (lines.length > 0) {
-        inputShares.value = lines
-        status.value = `已从剪贴板粘贴 ${lines.length} 个分片`
-        setTimeout(() => {
-          if (status.value.includes('已从剪贴板粘贴')) {
-            status.value = ''
-          }
-        }, 2000)
-      }
-    }
-  } catch (error) {
-    console.error('粘贴失败:', error)
+  const result = await readFromClipboardSafe()
+  
+  if (!result.success) {
+    console.error('粘贴失败:', result.error)
     status.value = '粘贴失败，请检查剪贴板权限'
+    return
+  }
+
+  const text = result.text
+  if (text && text.trim()) {
+    // 尝试解析多行分片
+    const lines = text.split('\n').filter(line => line.trim())
+    if (lines.length > 0) {
+      inputShares.value = lines
+      status.value = `已从剪贴板粘贴 ${lines.length} 个分片`
+      setTimeout(() => {
+        if (status.value.includes('已从剪贴板粘贴')) {
+          status.value = ''
+        }
+      }, 2000)
+    }
   }
 }
 
@@ -110,16 +117,17 @@ const recoverMnemonic = () => {
 }
 
 const copyRecoveredMnemonic = async () => {
-  try {
-    await navigator.clipboard.writeText(recoveredMnemonic.value)
+  const result = await writeToClipboardSafe(recoveredMnemonic.value)
+  
+  if (result.success) {
     status.value = '助记词已复制到剪贴板'
     setTimeout(() => {
       if (status.value === '助记词已复制到剪贴板') {
         status.value = ''
       }
     }, 2000)
-  } catch (error) {
-    console.error('复制失败:', error)
+  } else {
+    console.error('复制失败:', result.error)
     status.value = '复制失败，请手动复制'
   }
 }
