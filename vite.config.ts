@@ -4,7 +4,7 @@ import Vue from '@vitejs/plugin-vue'
 import Unocss from 'unocss/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
-import VueRouter from 'unplugin-vue-router/vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 import { defineConfig } from 'vite'
 
@@ -13,6 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '~/': `${path.resolve(__dirname, 'src')}/`,
+      'crypto': path.resolve(__dirname, 'src/polyfills/crypto-shim.ts'),
     },
   },
 
@@ -20,19 +21,12 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         additionalData: `@use "~/styles/element/index.scss" as *;`,
-        api: 'modern-compiler',
       },
     },
   },
 
   plugins: [
     Vue(),
-
-    // https://github.com/posva/unplugin-vue-router
-    VueRouter({
-      extensions: ['.vue', '.md'],
-      dts: 'src/typed-router.d.ts',
-    }),
 
     Components({
       // allow auto load markdown components under `./src/components/`
@@ -50,10 +44,15 @@ export default defineConfig({
     // https://github.com/antfu/unocss
     // see uno.config.ts for config
     Unocss(),
-  ],
 
-  ssr: {
-    // TODO: workaround until they support native ESM
-    noExternal: ['element-plus'],
-  },
+    // Node.js polyfills for browser
+    nodePolyfills({
+      include: ['buffer', 'process', 'util', 'stream', 'crypto'],
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
+    }),
+  ],
 })

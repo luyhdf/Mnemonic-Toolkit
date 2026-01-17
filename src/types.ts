@@ -1,3 +1,2 @@
-import type { ViteSSGContext } from 'vite-ssg'
-
-export type UserModule = (ctx: ViteSSGContext) => void
+// Type definitions for the application
+export * from './types/bip39'

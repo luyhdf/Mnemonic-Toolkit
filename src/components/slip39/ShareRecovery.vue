@@ -1,0 +1,237 @@
+<script setup>
+import { ref, watch } from 'vue'
+import Slip39 from 'slip39'
+import * as bip39 from 'bip39'
+
+const props = defineProps({
+  initialShares: {
+    type: Array,
+    default: () => []
+  },
+  initialPassword: {
+    type: String,
+    default: ''
+  }
+})
+
+const emit = defineEmits(['recovery-success', 'recovery-error'])
+
+const password = ref('')
+const recoveredMnemonic = ref('')
+const inputShares = ref(['', '', ''])
+const status = ref('')
+
+// 监听传入的初始分片
+watch(() => props.initialShares, (newShares) => {
+  if (newShares && newShares.length > 0) {
+    inputShares.value = [...newShares]
+    console.log('Initial shares loaded:', inputShares.value)
+  }
+}, { immediate: true })
+
+// 监听传入的初始密码
+watch(() => props.initialPassword, (newPassword) => {
+  if (newPassword) {
+    password.value = newPassword
+    console.log('Initial password loaded')
+  }
+}, { immediate: true })
+
+const addShare = () => {
+  inputShares.value.push('')
+}
+
+const removeShare = () => {
+  if (inputShares.value.length > 1) {
+    inputShares.value.pop()
+  }
+}
+
+const clearShares = () => {
+  inputShares.value = ['']
+  recoveredMnemonic.value = ''
+  status.value = ''
+}
+
+const pasteFromClipboard = async () => {
+  try {
+    const text = await navigator.clipboard.readText()
+    if (text && text.trim()) {
+      // 尝试解析多行分片
+      const lines = text.split('\n').filter(line => line.trim())
+      if (lines.length > 0) {
+        inputShares.value = lines
+        status.value = `已从剪贴板粘贴 ${lines.length} 个分片`
+        setTimeout(() => {
+          if (status.value.includes('已从剪贴板粘贴')) {
+            status.value = ''
+          }
+        }, 2000)
+      }
+    }
+  } catch (error) {
+    console.error('粘贴失败:', error)
+    status.value = '粘贴失败，请检查剪贴板权限'
+  }
+}
+
+const recoverMnemonic = () => {
+  try {
+    console.log('=== 开始恢复助记词 ===')
+    
+    // 过滤有效分片
+    const validShares = inputShares.value.filter(share => share && share.trim())
+    console.log('输入的SLIP39分片:', validShares)
+    
+    // 检查是否有有效分片
+    if (validShares.length === 0) {
+      throw new Error('请输入有效的SLIP39分片')
+    }
+    
+    // 1. 使用Slip39.recoverSecret方法恢复熵
+    const recoveredSecret = Slip39.recoverSecret(validShares, password.value)
+    console.log('恢复的原始数据 (Uint8Array):', recoveredSecret)
+    
+    // 检查恢复的数据是否有效
+    if (!recoveredSecret || recoveredSecret.length === 0) {
+      throw new Error('恢复失败: 无法从分片恢复数据')
+    }
+    
+    // 2. 转换为十六进制字符串
+    const secretHex = Array.from(recoveredSecret)
+      .map(byte => byte.toString(16).padStart(2, '0'))
+      .join('')
+    console.log('恢复的数据 (hex):', secretHex)
+    
+    // 3. 验证熵的长度是否符合BIP39要求
+    const entropyLength = recoveredSecret.length
+    console.log('恢复的数据长度:', entropyLength, '字节')
+    
+    // 4. 将熵转换为BIP39助记词
+    recoveredMnemonic.value = bip39.entropyToMnemonic(secretHex)
+    console.log('恢复的BIP39助记词:', recoveredMnemonic.value)
+    status.value = '恢复成功！'
+    
+    // 触发成功事件
+    emit('recovery-success', recoveredMnemonic.value)
+    
+    console.log('=== 恢复助记词完成 ===')
+  } catch (error) {
+    status.value = `恢复失败: ${error.message}`
+    console.error('恢复失败:', error)
+    
+    // 触发失败事件
+    emit('recovery-error', error)
+  }
+}
+
+const copyRecoveredMnemonic = async () => {
+  try {
+    await navigator.clipboard.writeText(recoveredMnemonic.value)
+    status.value = '助记词已复制到剪贴板'
+    setTimeout(() => {
+      if (status.value === '助记词已复制到剪贴板') {
+        status.value = ''
+      }
+    }, 2000)
+  } catch (error) {
+    console.error('复制失败:', error)
+    status.value = '复制失败，请手动复制'
+  }
+}
+</script>
+
+<template>
+  <div class="share-recovery">
+    <el-form label-position="top">
+      <el-form-item label="输入分片">
+        <el-space direction="vertical" style="width: 100%">
+          <div v-for="(share, index) in inputShares" :key="index" class="share-input">
+            <el-input 
+              v-model="inputShares[index]" 
+              placeholder="请输入分片"
+              clearable
+            >
+              <template #prepend>{{ index + 1 }}</template>
+            </el-input>
+          </div>
+          <el-space>
+            <el-button type="primary" size="small" @click="addShare">添加分片</el-button>
+            <el-button type="danger" size="small" @click="removeShare" :disabled="inputShares.length <= 1">
+              删除分片
+            </el-button>
+            <el-button type="info" size="small" @click="pasteFromClipboard">
+              从剪贴板粘贴
+            </el-button>
+            <el-button type="warning" size="small" @click="clearShares">
+              清空
+            </el-button>
+          </el-space>
+        </el-space>
+      </el-form-item>
+      
+      <el-form-item label="密码 (如果生成时使用了密码)">
+        <el-input 
+          v-model="password" 
+          placeholder="请输入密码" 
+          show-password
+        ></el-input>
+        <div class="help-text">如果生成分片时使用了密码，恢复时必须输入相同的密码</div>
+      </el-form-item>
+      
+      <el-form-item label="恢复设置">
+        <el-button type="primary" @click="recoverMnemonic">恢复助记词</el-button>
+      </el-form-item>
+      
+      <el-form-item v-if="recoveredMnemonic" label="恢复的助记词">
+        <el-input 
+          type="textarea" 
+          v-model="recoveredMnemonic" 
+          readonly 
+          :rows="4"
+        >
+          <template #append>
+            <el-button @click="copyRecoveredMnemonic" icon="DocumentCopy">复制</el-button>
+          </template>
+        </el-input>
+        <div class="success-text">✓ 助记词恢复成功！请妥善保管</div>
+      </el-form-item>
+    </el-form>
+    
+    <div v-if="status" class="status">
+      <el-alert 
+        :message="status" 
+        :type="status.includes('成功') ? 'success' : status.includes('失败') ? 'error' : 'info'" 
+        show-icon 
+        :closable="false"
+      ></el-alert>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.share-recovery {
+  width: 100%;
+}
+
+.share-input {
+  width: 100%;
+}
+
+.help-text {
+  font-size: 12px;
+  color: #909399;
+  margin-top: 4px;
+}
+
+.success-text {
+  font-size: 14px;
+  color: #67c23a;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.status {
+  margin-top: 16px;
+}
+</style>
