@@ -5,6 +5,7 @@ import Unocss from 'unocss/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import { viteSingleFile } from 'vite-plugin-singlefile'
 
 import { defineConfig } from 'vite'
 
@@ -54,5 +55,20 @@ export default defineConfig({
         process: true,
       },
     }),
+
+    // Single file build plugin
+    viteSingleFile(),
   ],
+
+  build: {
+    target: 'esnext',
+    assetsInlineLimit: 100000000, // 100MB - inline all assets
+    chunkSizeWarningLimit: 100000000,
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true,
+      },
+    },
+  },
 })

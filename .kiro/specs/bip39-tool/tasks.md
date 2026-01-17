@@ -7,32 +7,32 @@
 ## 任务
 
 - [ ] 1. 配置单文件构建环境
-  - [ ] 1.1 安装vite-plugin-singlefile插件
+  - [x] 1.1 安装vite-plugin-singlefile插件
     - 运行 `pnpm add -D vite-plugin-singlefile`
     - 验证插件安装成功
     - _需求: 9.7_
   
-  - [ ] 1.2 更新vite.config.ts配置
+  - [x] 1.2 更新vite.config.ts配置
     - 导入vite-plugin-singlefile插件
     - 添加单文件构建配置
     - 配置inlineAssets选项
     - 确保polyfills正确打包
     - _需求: 9.1, 9.2, 9.3, 9.4_
   
-  - [ ] 1.3 添加构建脚本到package.json
+  - [x] 1.3 添加构建脚本到package.json
     - 添加 `build:single` 命令用于单文件构建
     - 添加 `build:multi` 命令用于多文件构建（可选）
     - 更新现有 `build` 命令
     - _需求: 16.1, 16.2_
   
-  - [ ] 1.4 测试单文件构建
+  - [x] 1.4 测试单文件构建
     - 运行单文件构建命令
     - 验证生成的HTML文件
     - 在浏览器中测试离线功能
     - 检查文件大小是否合理
     - _需求: 9.5, 9.6, 9.8_
 
-- [ ] 2. 检查点 - 单文件构建完成
+- [x] 2. 检查点 - 单文件构建完成
   - 确保单HTML文件能在离线环境运行
   - 确保所有功能正常工作
   - 确保文件大小在合理范围内
