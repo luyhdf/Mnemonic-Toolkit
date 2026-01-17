@@ -122,19 +122,16 @@ generateMnemonic()
 
     <el-tabs v-model="activeTab" class="display-tabs">
       <el-tab-pane label="列表形式" name="list">
-        <div class="mnemonic-words">
-          <el-card
+        <div class="mnemonic-grid">
+          <div
             v-for="index in wordCount"
             :key="index"
-            class="word-card"
-            shadow="hover"
-            :body-style="{ padding: '10px' }"
+            class="word-item"
+            :class="{ 'has-word': words[index - 1] }"
           >
-            <div class="mnemonic-word">
-              <el-tag size="large" class="word-number">{{ index }}</el-tag>
-              <span class="word-text">{{ words[index - 1] || '' }}</span>
-            </div>
-          </el-card>
+            <span class="word-number">{{ index }}.</span>
+            <span class="word-text">{{ words[index - 1] || '—' }}</span>
+          </div>
         </div>
       </el-tab-pane>
       <el-tab-pane label="文本形式" name="text">
@@ -160,3 +157,131 @@ generateMnemonic()
 </template>
 
 
+
+<style lang="scss" scoped>
+// 间距变量
+$spacing-xs: 8px;
+$spacing-sm: 12px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+
+// 颜色变量
+$success: #67c23a;
+$border-base: #dcdfe6;
+$border-light: #e4e7ed;
+$bg-light: #f5f7fa;
+$text-regular: #606266;
+
+// 圆角变量
+$border-radius-base: 6px;
+$border-radius-md: 8px;
+
+// 阴影变量
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+$shadow-base: 0 2px 8px rgba(0, 0, 0, 0.12);
+$shadow-success: 0 2px 8px rgba(103, 194, 58, 0.2);
+
+// 过渡变量
+$transition-base: 0.3s;
+$ease-in-out: ease-in-out;
+
+.mnemonic-display {
+  .control-row {
+    margin-bottom: $spacing-lg;
+  }
+
+  .display-tabs {
+    margin-bottom: $spacing-lg;
+  }
+
+  .mnemonic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: $spacing-xs;
+    padding: $spacing-sm 0;
+
+    // 移动端响应式
+    @media (max-width: 767px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      padding: $spacing-xs 0;
+    }
+
+    // 平板响应式
+    @media (min-width: 768px) and (max-width: 1023px) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: $spacing-xs;
+    }
+
+    // 桌面响应式
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, 1fr);
+      gap: $spacing-sm;
+    }
+  }
+
+  .word-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid $border-light;
+    border-radius: $border-radius-base;
+    background-color: $bg-light;
+    min-height: 40px;
+    transition: all $transition-base $ease-in-out;
+    gap: $spacing-xs;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: $shadow-sm;
+      border-color: $border-base;
+    }
+
+    &.has-word {
+      border-color: $success;
+      background-color: rgba(103, 194, 58, 0.05);
+      box-shadow: 0 1px 4px rgba(103, 194, 58, 0.15);
+
+      &:hover {
+        box-shadow: 0 2px 8px rgba(103, 194, 58, 0.25);
+      }
+    }
+
+    // 移动端优化
+    @media (max-width: 767px) {
+      padding: 6px $spacing-xs;
+      min-height: 36px;
+      gap: 6px;
+    }
+  }
+
+  .word-number {
+    font-size: 12px;
+    font-weight: 600;
+    color: #909399;
+    min-width: 20px;
+    flex-shrink: 0;
+
+    // 移动端优化
+    @media (max-width: 767px) {
+      font-size: 11px;
+      min-width: 18px;
+    }
+  }
+
+  .word-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-regular;
+    flex: 1;
+    word-break: break-word;
+
+    // 移动端优化字体大小
+    @media (max-width: 767px) {
+      font-size: 13px;
+    }
+  }
+}
+</style>

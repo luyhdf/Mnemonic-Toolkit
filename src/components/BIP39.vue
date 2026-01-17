@@ -27,7 +27,13 @@ const handleValidityUpdate = (isValid) => {
 
 <template>
   <el-card class="main-card" shadow="hover">
-    <h1 class="main-title">{{ msg }}</h1>
+    <div class="header-section">
+      <h1 class="main-title">{{ msg }}</h1>
+      <el-radio-group v-model="wordCount" size="large" class="word-count-selector">
+        <el-radio-button :value="12">12个单词</el-radio-button>
+        <el-radio-button :value="24">24个单词</el-radio-button>
+      </el-radio-group>
+    </div>
 
     <MnemonicDisplay 
       :word-count="wordCount"
@@ -45,3 +51,49 @@ const handleValidityUpdate = (isValid) => {
 </template>
 
 
+
+<style lang="scss" scoped>
+.main-card {
+  margin: 20px 0;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.main-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #303133;
+
+  @media (max-width: 767px) {
+    font-size: 20px;
+  }
+}
+
+.word-count-selector {
+  @media (max-width: 767px) {
+    width: 100%;
+    
+    :deep(.el-radio-button) {
+      flex: 1;
+      
+      .el-radio-button__inner {
+        width: 100%;
+      }
+    }
+  }
+}
+</style>
