@@ -1,11 +1,11 @@
 {
-  "name": "bip39-slip39-tool",
+  "name": "mnemonic-toolkit",
   "type": "module",
   "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@10.14.0",
   "license": "MIT",
-  "description": "比特币助记词生成、备份、还原工具 - 支持BIP39和SLIP39",
+  "description": "Bitcoin mnemonic toolkit - Support BIP39 and SLIP39 | 比特币助记词工具包 - 支持BIP39和SLIP39",
   "scripts": {
     "dev": "vite",
     "build": "pnpm run build:online && pnpm run build:offline",

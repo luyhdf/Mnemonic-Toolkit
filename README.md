@@ -1,32 +1,34 @@
-# BIP39/SLIP39 助记词工具
+# Mnemonic Toolkit
 
-这是一个比特币助记词生成、备份、还原的单页面工具。
+> 安全的比特币助记词工具包 - 支持 BIP39 和 SLIP39 标准
+
+这是一个专业的比特币助记词生成、备份、还原工具，支持在线和离线两种使用模式。
 
 ## 🌐 在线使用
 
-- **在线版本**: [https://your-username.github.io/your-repo-name/](https://your-username.github.io/your-repo-name/)
+- **在线版本**: [https://your-username.github.io/mnemonic-toolkit/](https://your-username.github.io/mnemonic-toolkit/)
 - **离线版本**: 访问在线版本后点击"下载离线版本"按钮
 
-## 功能特性
+## ✨ 功能特性
 
-- ✅ **BIP39 助记词工具**
-  - 生成 12/24 词助记词
-  - 助记词验证
-  - 从剪贴板粘贴助记词
-  - 转换为 SLIP39 分片
+### BIP39 助记词工具
+- ✅ 生成 12/24 词助记词
+- ✅ 助记词验证
+- ✅ 从剪贴板粘贴助记词
+- ✅ 转换为 SLIP39 分片
 
-- ✅ **SLIP39 分片工具**
-  - 生成分片（支持多组配置）
-  - 恢复助记词
-  - 密码保护
-  - 分片复制和粘贴
+### SLIP39 分片工具
+- ✅ 生成分片（支持多组配置）
+- ✅ 恢复助记词
+- ✅ 密码保护
+- ✅ 分片复制和粘贴
 
-- ✅ **BIP39 和 SLIP39 互相转换**
-- ✅ **支持在线和离线两种模式**
-  - 在线版本：多文件加载，适合快速访问
-  - 离线版本：单 HTML 文件，可在无网络环境下使用
+### 双模式支持
+- ✅ **在线版本**：多文件加载，适合快速访问
+- ✅ **离线版本**：单 HTML 文件（1.1MB），可在无网络环境下使用
+- ✅ **BIP39 ⇄ SLIP39**：双向转换支持
 
-## 技术栈
+## 🛠 技术栈
 
 - Vue 3 + TypeScript
 - Element Plus UI 组件库
@@ -34,7 +36,7 @@
 - bip39 库（助记词生成）
 - slip39 库（分片助记词）
 
-## 开发
+## 📦 开发
 
 ### 安装依赖
 
@@ -71,7 +73,7 @@ pnpm run build:offline
 pnpm preview
 ```
 
-## 部署到 GitHub Pages
+## 🚀 部署到 GitHub Pages
 
 ### 方法一：自动部署（推荐）
 
@@ -91,7 +93,9 @@ pnpm preview
    - Branch: main
    - Folder: /docs
 
-## 项目结构
+详细部署说明请查看 [DEPLOY.md](./DEPLOY.md)
+
+## 📁 项目结构
 
 ```
 src/
@@ -121,15 +125,25 @@ docs/                    # GitHub Pages 部署目录
     └── index.html       # 离线版本（单文件）
 ```
 
-## 安全提示
+## 🔒 安全提示
 
 ⚠️ **重要安全提示**：
+
 - **强烈建议使用离线版本**：下载离线版本后，在完全断网的环境中使用
 - 永远不要在不安全的网络环境下输入或显示助记词
 - 妥善保管你的助记词和分片
 - 不要截图或拍照保存助记词
 - 建议使用纸笔抄写并保存在安全的地方
+- 定期备份并验证你的助记词
 
-## License
+## 📄 License
 
 MIT
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+## ⭐ Star History
+
+如果这个项目对你有帮助，请给它一个 Star ⭐

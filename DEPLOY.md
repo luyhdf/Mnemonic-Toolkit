@@ -1,6 +1,6 @@
 # 部署指南
 
-本文档说明如何将 BIP39/SLIP39 助记词工具部署到 GitHub Pages。
+本文档说明如何将 Mnemonic Toolkit 部署到 GitHub Pages。
 
 ## 📦 构建说明
 
