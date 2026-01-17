@@ -93,7 +93,7 @@ pnpm preview
    - Branch: main
    - Folder: /docs
 
-详细部署说明请查看 [DEPLOY.md](./DEPLOY.md)
+详细部署说明请查看 [docs-dev/DEPLOY.md](./docs-dev/DEPLOY.md)
 
 ## 📁 项目结构
 
@@ -123,6 +123,12 @@ docs/                    # GitHub Pages 部署目录
 ├── assets/              # 在线版本资源文件
 └── offline/
     └── index.html       # 离线版本（单文件）
+
+docs-dev/                # 开发文档目录
+├── DEPLOY.md            # 部署指南
+├── TEST_OFFLINE.md      # 离线版本测试指南
+├── RENAME_INSTRUCTIONS.md # 项目重命名说明
+└── test-protocol.html   # 协议检测测试页面
 ```
 
 ## 🔒 安全提示
@@ -139,6 +145,12 @@ docs/                    # GitHub Pages 部署目录
 ## 📄 License
 
 MIT
+
+## 📚 开发文档
+
+- [部署指南](./docs-dev/DEPLOY.md) - GitHub Pages 部署详细说明
+- [离线测试](./docs-dev/TEST_OFFLINE.md) - 离线版本测试指南
+- [项目规范](./docs-dev/RENAME_INSTRUCTIONS.md) - 项目重命名说明
 
 ## 🤝 贡献
 
