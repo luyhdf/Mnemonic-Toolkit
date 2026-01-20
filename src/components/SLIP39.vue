@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
-import ShareGenerator from './ShareGenerator.vue'
-import ShareRecovery from './ShareRecovery.vue'
+import ShareGenerator from './slip39/ShareGenerator.vue'
+import ShareRecovery from './slip39/ShareRecovery.vue'
 
 const props = defineProps({
   bip39Mnemonic: {

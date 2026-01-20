@@ -8,12 +8,12 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*"],
+      "@/*": ["src/*"]
     },
     "resolveJsonModule": true,
     "types": [
-      "vite/client",
-      "unplugin-vue-router/client"
+      "vite/client"
     ],
     "strict": true,
     "sourceMap": true,

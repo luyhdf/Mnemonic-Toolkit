@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import BIP39 from './components/BIP39.vue'
-import SLIP39 from './components/slip39/SLIP39.vue'
+import SLIP39 from './components/SLIP39.vue'
 import AppHeader from './components/AppHeader.vue'
 
 const activeTool = ref('bip39')
