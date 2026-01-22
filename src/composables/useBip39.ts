@@ -1,4 +1,5 @@
-import * as bip39 from 'bip39'
+import * as bip39 from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english.js'
 import type { WordCount, MnemonicValidation } from '../types/bip39'
 
 /**
@@ -22,7 +23,7 @@ export function useBip39() {
       throw new Error('Word count must be 12 or 24')
     }
     const strength = wordCount === 12 ? 128 : 256
-    return bip39.generateMnemonic(strength)
+    return bip39.generateMnemonic(wordlist, strength)
   }
 
   /**
@@ -39,7 +40,7 @@ export function useBip39() {
     if (!mnemonic || typeof mnemonic !== 'string') {
       return false
     }
-    return bip39.validateMnemonic(mnemonic)
+    return bip39.validateMnemonic(mnemonic, wordlist)
   }
 
   /**
@@ -57,7 +58,8 @@ export function useBip39() {
     if (!validateMnemonic(mnemonic)) {
       throw new Error('Invalid mnemonic')
     }
-    return bip39.mnemonicToEntropy(mnemonic)
+    const entropy = bip39.mnemonicToEntropy(mnemonic, wordlist)
+    return Array.from(entropy).map(b => b.toString(16).padStart(2, '0')).join('')
   }
 
   /**
@@ -75,7 +77,12 @@ export function useBip39() {
     if (!entropy || typeof entropy !== 'string') {
       throw new Error('Invalid entropy')
     }
-    return bip39.entropyToMnemonic(entropy)
+    const matches = entropy.match(/.{1,2}/g)
+    if (!matches) {
+      throw new Error('Invalid entropy format')
+    }
+    const entropyUint8 = new Uint8Array(matches.map(byte => parseInt(byte, 16)))
+    return bip39.entropyToMnemonic(entropyUint8, wordlist)
   }
 
   /**
@@ -99,7 +106,7 @@ export function useBip39() {
       return []
     }
 
-    return bip39.wordlists.english
+    return wordlist
       .filter(word => word.startsWith(normalizedInput))
       .slice(0, limit)
   }
@@ -118,7 +125,7 @@ export function useBip39() {
     if (!word || typeof word !== 'string') {
       return false
     }
-    return bip39.wordlists.english.includes(word.toLowerCase().trim())
+    return wordlist.includes(word.toLowerCase().trim())
   }
 
   /**
@@ -141,7 +148,7 @@ export function useBip39() {
       return false
     }
 
-    return bip39.wordlists.english.some(word => word.startsWith(normalizedInput))
+    return wordlist.some(word => word.startsWith(normalizedInput))
   }
 
   /**
@@ -234,7 +241,7 @@ export function useBip39() {
    * 验证: 需求 1.4
    */
   const getWordlist = (): string[] => {
-    return bip39.wordlists.english
+    return wordlist
   }
 
   return {

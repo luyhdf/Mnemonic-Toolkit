@@ -1,5 +1,6 @@
 import Slip39 from 'slip39'
-import * as bip39 from 'bip39'
+import * as bip39 from '@scure/bip39'
+import { wordlist } from '@scure/bip39/wordlists/english.js'
 import type { 
   SLIP39Config, 
   ShareGenerationResult, 
@@ -43,12 +44,12 @@ export function useSlip39() {
       }
 
       // 验证助记词有效性
-      if (!bip39.validateMnemonic(mnemonic)) {
+      if (!bip39.validateMnemonic(mnemonic, wordlist)) {
         throw new Error('BIP39助记词无效')
       }
 
       // 1. 将BIP39助记词转换为熵字节数组
-      const entropy = bip39.mnemonicToEntropy(mnemonic)
+      const entropy = bip39.mnemonicToEntropy(mnemonic, wordlist)
       
       // 检查entropy是否有效
       if (!entropy) {
@@ -56,7 +57,7 @@ export function useSlip39() {
       }
 
       // 2. 转换为普通数组（不是Uint8Array）
-      const entropyBytes = entropy.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16))
+      const entropyBytes = Array.from(entropy)
 
       // 3. 确保groups是一个数组
       const groupConfigs = (config.groups || []).map(g => [g.threshold, g.shares])
@@ -128,13 +129,11 @@ export function useSlip39() {
         }
       }
 
-      // 2. 转换为十六进制字符串
-      const secretHex = Array.from(recoveredSecret)
-        .map(byte => byte.toString(16).padStart(2, '0'))
-        .join('')
+      // 2. 转换为Uint8Array
+      const entropyUint8 = new Uint8Array(recoveredSecret)
 
       // 3. 将熵转换为BIP39助记词
-      const mnemonic = bip39.entropyToMnemonic(secretHex)
+      const mnemonic = bip39.entropyToMnemonic(entropyUint8, wordlist)
 
       return {
         mnemonic,

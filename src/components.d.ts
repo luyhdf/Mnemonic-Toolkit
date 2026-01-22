@@ -34,7 +34,7 @@ declare module 'vue' {
     Mnemonic: typeof import('./components/bip39/Mnemonic.vue')['default']
     ShareGenerator: typeof import('./components/slip39/ShareGenerator.vue')['default']
     ShareRecovery: typeof import('./components/slip39/ShareRecovery.vue')['default']
-    SLIP39: typeof import('./components/slip39/SLIP39.vue')['default']
+    SLIP39: typeof import('./components/SLIP39.vue')['default']
     WordInput: typeof import('./components/bip39/WordInput.vue')['default']
   }
 }

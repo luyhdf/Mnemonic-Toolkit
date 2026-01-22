@@ -5,7 +5,7 @@ node_modules
 dist
 dist-ssr
 *.local
-
+.pnpm-store
 # lock
 yarn.lock
 package-lock.json
@@ -14,3 +14,4 @@ package-lock.json
 
 # 保留 docs 文件夹用于 GitHub Pages
 # !docs/
+
