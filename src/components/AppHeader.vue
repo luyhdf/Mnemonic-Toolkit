@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Connection, Download, Key, Link, SuccessFilled } from '@element-plus/icons-vue'
 
 // 检测是否为离线环境（通过检查是否为 file:// 协议）
 const isOffline = computed(() => {
@@ -28,7 +29,7 @@ const downloadOfflineVersion = async () => {
     window.URL.revokeObjectURL(url)
     document.body.removeChild(a)
     
-    ElMessage.success('离线版本下载成功！')
+    ElMessage.success('本地版本下载成功！')
   } catch (error) {
     console.error('下载失败:', error)
     ElMessage.error('下载失败，请稍后重试')
@@ -50,25 +51,25 @@ const openOnlineVersion = () => {
       <el-icon class="app-icon" :size="28">
         <Key />
       </el-icon>
-      <h1 class="app-title">BIP39/SLIP39 助记词工具</h1>
+      <h3 class="app-title">BIP39/SLIP39 助记词工具</h3>
       <el-tag size="small">v1.0.0</el-tag>
     </div>
     
     <div class="header-right">
+      <p>当前环境：</p>
       <!-- 离线环境标识 -->
       <el-tag v-if="isOffline" type="success" size="large">
         <el-icon><SuccessFilled /></el-icon>
-        当前为离线版本
+        本地版本
       </el-tag>
       
       <!-- 在线环境标识 -->
       <template v-else>
         <el-tag type="primary" size="large">
           <el-icon><Connection /></el-icon>
-          当前为在线版本
+          在线版本
         </el-tag>
         <span class="separator">|</span>
-        <span class="hint">推荐下载</span>
       </template>
       
       <!-- 版本切换按钮 -->
@@ -89,10 +90,10 @@ const openOnlineVersion = () => {
         @click="downloadOfflineVersion"
       >
         <el-icon><Download /></el-icon>
-        离线版本
+        本地版本
       </el-button>
       
-      <span v-if="!isOffline" class="hint">下载后可在无网络环境下使用，更安全</span>
+      <span v-if="!isOffline" class="hint">推荐下载后在离线环境下使用,更安全</span>
     </div>
   </div>
 </template>

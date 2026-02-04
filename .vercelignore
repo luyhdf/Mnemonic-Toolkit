@@ -1,0 +1,8 @@
+node_modules
+build
+docs
+dist
+.git
+.trae
+.log
+.figma
